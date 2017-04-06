@@ -1,0 +1,57 @@
+%% from review-pdfmaker
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\gtfamily\sffamily\bfseries\upshape \leftmark}
+\rhead{\gtfamily\sffamily\bfseries\upshape \rightmark}
+\renewcommand{\headfont}{\gtfamily\sffamily\bfseries}
+
+\newcommand{\rename}[2]{
+  \expandafter\global\expandafter\let\csname #2\expandafter\endcsname%
+  \csname #1\endcsname
+  \expandafter\let\csname #1\endcsname\relax
+}
+
+\fancypagestyle{plainhead}{%
+\fancyhf[lh,rh,ch]{}
+\fancyhead{}
+\fancyfoot{} % clear all header and footer fields
+\fancyhead[CE,CO]{}
+%\renewcommand{\sectionmark}[1]{\markleft{\thesection~#1}{}}
+\fancyhead[LO]{\leftmark}
+\fancyhead[RE]{\rightmark}
+\fancyfoot[CE,CO]{\thepage}
+}
+\renewcommand{\chaptermark}[1]{\markright{\prechaptername\ \thechapter\ \postchaptername~#1}{}}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\pagestyle{empty}
+
+%\renewcommand{\rmdefault}{urml}
+\renewcommand{\familydefault}{urml}
+\renewcommand{\kanjifamilydefault}{\rmdefault}
+
+%% using Helvetica as sans-serif
+%\renewcommand{\sfdefault}{phv}
+%% for listings
+%\renewcommand{\lstlistingname}{List}
+%\lstset{%
+%  breaklines=true,%
+%  breakautoindent=false,%
+%  breakindent=0pt,%
+%  fontadjust=true,%
+%  backgroundcolor=\color{shadecolor},%
+%  frame=single,%
+%  framerule=0pt,%
+%  basicstyle=\ttfamily\scriptsize,%
+%  commentstyle=\color{reviewgreen},%
+%  identifierstyle=\color{reviewblue},%
+%  stringstyle=\color{reviewred},%
+%  keywordstyle=\bfseries\color{reviewdarkred},%
+%}
+
+\geometry{top=20mm,bottom=20mm,left=20mm,right=20mm}
+
+
+
+\sloppy

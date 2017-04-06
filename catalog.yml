@@ -1,0 +1,11 @@
+PREDEF:
+
+CHAPS:
+  - 1_introduction.re
+  - 2_802154_in_linux.re
+  - 3_howto_setup.re
+  - 4_comm_test.re
+  - 5_sniffer.re
+  - 6_6lowpan_from_contiki.re
+POSTDEF:
+  - postscript.re
