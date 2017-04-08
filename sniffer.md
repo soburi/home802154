@@ -74,9 +74,6 @@ python3 sensniff.py -d /dev/ttyUSB0 -b 1000000 -c 12 -n
 ```
 
 
-
-
-
 Wiresharkでスニファのパケットを見る
 ------------------------------------
 
@@ -95,5 +92,8 @@ named pipeからスニファのパケットを読みだして、これを表示�
 wireshark -i /tmp/sensniff
 ```
 
+
+
+![sensniff](images/sniffer.png "sniffer")
 
 

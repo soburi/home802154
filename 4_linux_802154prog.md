@@ -27,7 +27,7 @@ Socketによる通信のサンプルとなっている。
 
 まず、IEEE802.15.4のアドレス定義は
 /usr/include/sysの配下には入っていないので、
-カーネルの定義をコピーしてソースに組み込む
+カーネルに含まれる以下の定義をコピーしてソースに組み込む
 必要がある。
 
 ```
@@ -68,7 +68,7 @@ Long Addressは64bitの 拡張MACアドレス(EUI-64)のハードウェアアド
 アドレスの定義さえIEEE802.15.4の定義に従うものにしてしまえば、
 その先は至って普通のソケット通信である。
 
-まず、送信先のアドレスとバッファを設定する。
+`af_ieee802154_tx.c`では、まず送信先のアドレスとバッファを設定する。
 意味的には以下のコードと同じ操作。
 `pan_id`と`hwaddr`は使っている環境に合わせて書き換える必要がある。
 
@@ -83,11 +83,11 @@ struct sockaddr_ieee802154 dst = {
 	}
 };
 
-unsigned char buf[MAX_PACKET_LEN + 1] = "Hello world from IEEE 802.15.4 socket example!";
+unsigned char buf[MAX_PACKET_LEN + 1] =
+           "Hello world from IEEE 802.15.4 socket example!";
 ```
 
 ソケットを作成して、 sendtoで送信する。
-
 
 ```
 sd = socket(PF_IEEE802154, SOCK_DGRAM, 0);
@@ -95,7 +95,7 @@ len = sendto(sd, buf, strlen(buf), 0, (struct sockaddr *)&dst, sizeof(dst));
 ```
 
 
-受ける側も同様にソケットを作成して`bind`したのち、
+受信側の`af_ieee802154_rx.c`も同様にソケットを作成して`bind`したのち、
 `recvfrom`で受信する。
 `bind`はIEEE802.15.4のインターフェースを指定するため、
 インターフェースの持つアドレスを指定してsocketを括りつけるための操作。
@@ -145,7 +145,6 @@ len = recvfrom(sd, buf, MAX_PACKET_LEN, 0, (struct sockaddr *)&dst, &addrlen);
 
 IEEE802.15.4経由で6LoWPANを使う場合に気を付けるのは、
 IEEE802.15.4のアドレスとIPv6アドレスとの対応づけだ。
-
 EUI64からは以下の手順でIPv6のInterfaceIDが算出される。
 
 * 先頭アドレスから7ビット目のビットを反転させる。

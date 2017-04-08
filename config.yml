@@ -20,7 +20,7 @@ review_version: 2.0
 bookname: home802154
 # 書名
 # 読みを入れる例 booktitle: {name: "Re:VIEW EPUBサンプル", file-as: "リビューイーパブサンプル"}
-booktitle: {name: "自宅 IEEE802.15.4 ネットワーク" }
+booktitle: {name: "自宅IEEE802.15.4通信" }
 
 # 著者名。「, 」で区切って複数指定できる
 # 読みを入れる例 aut: [{name: "青木峰郎", file-as: "アオキミネロウ"}, {name: "武藤健志", file-as: "ムトウケンシ"}, {name: "高橋征義", file-as: "タカハシマサヨシ"}, {name: "角征典", file-as: "カドマサノリ"}]
@@ -192,7 +192,7 @@ toc: true
 # coverfile: カバーページのbody要素内に挿入する内容を記述したファイル名
 cover: _cover.html
 # coverimage: 表紙用画像ファイル
-#coverimage: jn5164-twelite-guided-tour.eps
+#coverimage: cover.eps
 cover_linear: true
 titlepage: true
 # 目次として抽出するレベル

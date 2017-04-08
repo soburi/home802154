@@ -17,14 +17,9 @@ IEEE802.15.4ネットワークのセットアップ
 セットアップ
 ----------
 
-### XBeeの接続
-
-RaspberryPi の USBポートにアダプタを接続し、
-XBeeを接続する。
-
 ### XBeeカーネルドライバのコンパイル
 
-https://github.com/soburi/XBee-linux-serial-driver
+[https://github.com/soburi/XBee-linux-serial-driver](https://github.com/soburi/XBee-linux-serial-driver)
 をコンパイルする。
 
 ```
@@ -71,6 +66,10 @@ XBee用のデバイスドライバは
 
 で読み込む。
 
+### XBeeの接続
+
+RaspberryPi の USBポートにアダプタを接続し、
+XBeeを接続する。
 
 ### ldattach
 
@@ -85,13 +84,13 @@ XBeeはシリアルで接続されているため、
 XBeeドライバはカーネル内に種別の定義がないので、
 明示的な定義のない25を使っている。
 
-ldattachを行うと、XBeeドライバでネットワークインターフェース
+`ldattach`を行うと、XBeeドライバでネットワークインターフェース
 がカーネルに登録される。
 
 
 ### Socket, 6LoWPANのインターフェースの立ち上げ
 
-ldattachで登録されたネットワークインターフェースを
+`ldattach`で登録されたネットワークインターフェースを
 立ち上げる。
 
 Socketを使用する場合は、wpan0をupする。
@@ -108,7 +107,7 @@ ip link add link wpan0 name lowpan0 type lowpan
 ip link set lowpan0 up
 ```
 
-これで、プログラムからの通信が可能となる。
+これで、ユーザーランドのプログラムからの通信が可能となる。
 
 
 
@@ -132,10 +131,10 @@ ip link set lowpan0 up
 
 ### /etc/modules
 
-システムの起動時に /etc/modules を参照して、
+システムの起動時に `/etc/modules` を参照して、
 モジュールをロードする。
 IEEE802.15.4のモジュールを起動時にロードするには、
-/etc/modules に 単純に以下の行を追加する。
+`/etc/modules` に 単純に以下の行を追加する。
 
 ```
 ieee802154
@@ -154,7 +153,7 @@ USBデバイスの接続検知はudevで行うが、
 アダプタにはFT232 が使われてる場合が多いので、
 他のFT232のデバイスが接続されたときに識別できるようにする必要がある。
 
-`FT_Prog` でパラメータを設定して、デバイスを認識、
+`FT_Prog`[^1] のユーティリティでFT232のパラメータを設定して、デバイスを認識、
 ドライバのロードを自動化することができる。
 
 USBのVID,PIDを変更するのはusb.orgの管理なので仕様上は独自の番号がつけられない。
@@ -178,9 +177,11 @@ ACTION=="remove", SUBSYSTEM=="tty", ENV{ID_MODEL}=="XBee_UART_Adapter", \
   RUN+="/bin/sh -c '/bin/systemctl stop ldattach-xbee@$name'"
 ```
 
+[^1]: <http://www.ftdichip.com/Support/Utilities.htm#FT_PROG>
+
 ### /lib/systemd/system/ldattach-xbee@.service
 
-systemdにldattachの起動設定を追加する。
+`systemd`にl`dattach`の起動設定を追加する。
 パラメータに`/dev/` 以下のtty名を取るようにする。
 ldattachは普通に起動するとdaemon化するので、
 `-d`をつけてバックグラウンド実行しないようにする。
@@ -241,8 +242,6 @@ iwpan
 
 Debianでは`wpan-tools`のパッケージに含まれている。
 
-
-
 LinuxのIEEE802.15.4のデバイスドライバは、物理層とMAC層の2つの
 パートで構成されており、iwpanのコマンドもその設計に従ったものになる。
 
@@ -250,6 +249,6 @@ LinuxのIEEE802.15.4のデバイスドライバは、物理層とMAC層の2つ�
 それぞれ、物理層、MAC層の設定を扱う。
 
 物理層では、使用するチャンネルの設定や、電波の出力などを設定する。
-MAC層では、デバイスのアドレスを設定する。
+MAC層では、デバイスのアドレス、PAN IDなどを設定する。
 
 

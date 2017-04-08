@@ -13,17 +13,21 @@ contikiのサンプルでは `examples/udp-ipv6` が通信確認に
 RPL, NDP
 --------
 IEEE802.15.4などの省電力ネットワーク向けにRPL
-(IPv6 Routing Protocol for Low-Power and Lossy Networks)
+(IPv6 Routing Protocol for Low-Power and Lossy Networks)[^1]
 というルーティングプロトコルがあり、Contikiもこれの実装を持っている。
 が、Linux側に十分こなれた実装がない。
 今回は普通のv6ネットワークで使う、
-NDP(Neighbor Discovery for IP version 6 (IPv6))で
+NDP(Neighbor Discovery for IP version 6 (IPv6))[^2] で
 Router Advatiseをradvdから通知してルーター情報の設定を行う。
 
 NDPを使う場合、通信経路の確立のためブロードキャストのメッセージが
 頻繁に流れるため、省電力ネットワークには不向きの動きとなる。
-(文字通り、「寝た子を起こす」ことになるので」
+(文字通り、「寝た子を起こす」ことになるので)
 現状、適当な代替手段がないので、実験的に使うことにする。
+
+[^1]: <https://tools.ietf.org/html/rfc6550>
+[^2]: <https://tools.ietf.org/html/rfc4861>
+
 
 Router Advatiseの受信設定
 -------------------------
@@ -89,7 +93,7 @@ index 15230c4f0..034702d5e 100644
 
 mDNSを使う場合は、ホスト側の `/etc/avahi/hosts` に
 `contiki-udp-server.local` の設定を追加する。
-lowpan0のアドレスを設定する。
+lowpan0のLink Localアドレスを設定する。
 
 
 ```
@@ -97,21 +101,85 @@ fe80::213:a200:4090:4064 contiki-udp-server.local
 ```
 
 
-最後に、RPLの無効をしてビルドする。
+TWE-Lite向けにビルドして焼き込むと、通信が開始される。
 
 ```
-make TARGET=jn516x CHIP=JN5164 -j4 CONTIKI_WITH_RPL=0
+make TARGET=jn516x CHIP=JN5164 -j4
 ```
 
-これで、出来たバイナリをTWE-Liteに焼き込むと、
+
+
+Contikiプログラミング入門(超簡略版)
+------------------------------------
+
+ソースの追いかけてContikiでのUDPの使い方を見てみる。
+が、その前にプログラム作成するのに必要な最低限のContikiの
+概要について説明する。
+
+Contikiは、基本的にmain関数一本で動いている、組み込みOSである。
+実際にはOSというよりも、ベアメタル上でマルチタスク風の処理記述が出来る
+フレームワークと言った方が近い。
+最大の特徴は、マルチタスク処理を行うためのProtothreadと呼ばれる機能で、
+
+
+Contikiのプロセスはおおよそ以下のような形をとる。
+
+```
+PROCESS_THREAD(sample_process, ev, data)
+{
+  PROCESS_BEGIN()
+  while(1) {
+    /* 他のタスクへ処理を要求する */
+    ...
+    /* 他のタスクからのイベント通知を待つ */
+    PROCESS_YIELD();
+  }
+  PROCESS_END()
+}
+```
+
+プロセスの宣言は`PROCESS_THREAD`で始めて、
+`PROCESS_BEGIN`と、`PROCESS_END`の間で
+処理のメインループとなるようループを作る。
+Contikiはプリエンティブなマルチタスクではないので、
+他のプロセスに対して(あとで通知が来る)要求を行ったのち、
+`PROCESS_YIELD`で休眠状態に入る。
+他のタスクから何らかの通知が発生すると、
+休眠を解除して、処理に復帰する。
+
+シンプルな通知として、タイマー通知がある。
+使い方としては、以下のような形でになる。
+
+```
+  etimer_set(&et, SEND_INTERVAL);
+  PROCESS_YIELD();
+  ...
+```
+
+タイマーの通知要求を出して、
+`PROCESS_YIELD`でプロセスは停止状態に入る。
+タイマ経過後にイベントが通知され、
+`PROCESS_YIELD`の先の処理が実行される。
+このようにして、多プロセスと協調的なマルチスレッド動作を
+行うのがContikiのプログラムの基本的な流れである。
+
+
+マクロによって隠蔽されているので、あまり意識しないが、
+`PROCESS_THREAD`の実体は関数宣言で、マクロで隠蔽されている
+状態変数の構造体をプロセス制御で管理している。
+`PROCESS_YIELD`で停止しているのは、実際には状態変数を参照して、
+すぐこの関数から`return`して他のプロセスに処理を渡すような
+制御を行っている。
+(マクロを展開すると、`PROCESS_BEGIN`はswitch文になっていて、
+ そこから、行番号を状態変数として遷移先を決めている。)
+したがって、状態を保持するような変数はstatic変数や、
+グローバル変数にするなどの対応が必要になる。
 
 
 udp-client.c 解題
 ----------------
 
-ソースの追いかけてContikiでのUDPの使い方を見てみる。
-
-まず、`AUTOSTART_PROCESS` に書かれているのが、起動される処理になる。
+まず、`AUTOSTART_PROCESS` に書かれているプロセスが、起動される処理になる。
 
 ```
 AUTOSTART_PROCESSES(&resolv_process,&udp_client_process);
@@ -139,7 +207,8 @@ AUTOSTART_PROCESSES(&resolv_process,&udp_client_process);
   }
 ```
 
-名前解決に失敗したら、`PROCESS_YIELD`が呼ばれ、
+名前解決に失敗したら、`PROCESS_YIELD`が呼ばれる。
+他のプロセスから通知があるまでこのプログラムは実行を停止する。
 
 UDPは、`udp_new` と `udp_bind` で初期化している。
 Linuxでのsocketの処理と似たような構造になっている。
@@ -148,6 +217,7 @@ Linuxでのsocketの処理と似たような構造になっている。
   client_conn = udp_new(&ipaddr, UIP_HTONS(3000), NULL);
   udp_bind(client_conn, UIP_HTONS(3001));
 ```
+
 udp の初期化が終わったら、周期実行を行う無限ループに入る。
 
 ```
@@ -177,9 +247,8 @@ udp の初期化が終わったら、周期実行を行う無限ループに入�
   uip_udp_packet_send(client_conn, buf, strlen(buf));
 #endif /* SEND_TOO_LARGE_PACKET_TO_TEST_FRAGMENTATION */
 ```
-`uip_udp_packet_send` で UDPパケットの送信を行う。
+
+bufに送信する文字列を詰めて、
+`uip_udp_packet_send` で UDPパケットの送信を行っている。
 
 
-//raw[|latex| \\clearpage ]
-
-hoge
