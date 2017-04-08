@@ -4,8 +4,12 @@ CHAPS:
   - 1_introduction.re
   - 2_802154_in_linux.re
   - 3_howto_setup.re
-  - 4_comm_test.re
-  - 5_sniffer.re
-  - 6_6lowpan_from_contiki.re
+  - 4_linux_802154prog.re
+  - 5_6lowpan_from_contiki.re
+  - 6_6lowpan_from_arduinolikeenv.re
+  - 6_a_tcpecho.re
 POSTDEF:
+  - sniffer.re
+  - about_xbee_driver.re
+  - current_status.re
   - postscript.re

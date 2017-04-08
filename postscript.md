@@ -1,5 +1,8 @@
+
 あとがき
---------
+========
+
+//raw[|latex| \\thispagestyle{empty} ]
 
 LAPIS SemiconductorさんのLazuriteは現状で、小売りベースで流通している
 数少ないSubGHzの無線が扱えるオモチャです。

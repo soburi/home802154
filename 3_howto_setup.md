@@ -210,7 +210,9 @@ iface wpan0 inet6 auto
 	pre-down /bin/ip link delete lowpan0 type lowpan
 
 iface lowpan0 inet6 auto
-	post-up /etc/init.d/radvd restart
+	post-up systemctl restart avahi-daemon
+	post-up systemctl restart radvd
+
 ```
 
 
@@ -229,4 +231,25 @@ interface lowpan0 {
           };
 };
 ```
+
+
+iwpan
+------
+
+`iwpan`はLinuxのIEEE802.15.4のデバイスの設定を表示・変更するための
+コマンドラインのツールである。
+
+Debianでは`wpan-tools`のパッケージに含まれている。
+
+
+
+LinuxのIEEE802.15.4のデバイスドライバは、物理層とMAC層の2つの
+パートで構成されており、iwpanのコマンドもその設計に従ったものになる。
+
+すなわち、`iwpan`のサブコマンドで大きく２つ、`phy` と `dev` があり、
+それぞれ、物理層、MAC層の設定を扱う。
+
+物理層では、使用するチャンネルの設定や、電波の出力などを設定する。
+MAC層では、デバイスのアドレスを設定する。
+
 

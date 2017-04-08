@@ -1,5 +1,9 @@
 %% from review-pdfmaker
 \usepackage{fancyhdr}
+\usepackage{otf}
+
+\geometry{top=20mm,bottom=20mm,left=20mm,right=20mm}
+
 \pagestyle{fancy}
 \lhead{\gtfamily\sffamily\bfseries\upshape \leftmark}
 \rhead{\gtfamily\sffamily\bfseries\upshape \rightmark}
@@ -17,8 +21,8 @@
 \fancyfoot{} % clear all header and footer fields
 \fancyhead[CE,CO]{}
 %\renewcommand{\sectionmark}[1]{\markleft{\thesection~#1}{}}
-\fancyhead[LO]{\leftmark}
-\fancyhead[RE]{\rightmark}
+\fancyhead[RO]{\rightmark}
+\fancyhead[LE]{\leftmark}
 \fancyfoot[CE,CO]{\thepage}
 }
 \renewcommand{\chaptermark}[1]{\markright{\prechaptername\ \thechapter\ \postchaptername~#1}{}}
@@ -28,8 +32,8 @@
 \pagestyle{empty}
 
 %\renewcommand{\rmdefault}{urml}
-\renewcommand{\familydefault}{urml}
-\renewcommand{\kanjifamilydefault}{\rmdefault}
+%\renewcommand{\familydefault}{ugbm}
+%\renewcommand{\kanjifamilydefault}{ugbm}
 
 %% using Helvetica as sans-serif
 %\renewcommand{\sfdefault}{phv}
@@ -49,8 +53,6 @@
 %  stringstyle=\color{reviewred},%
 %  keywordstyle=\bfseries\color{reviewdarkred},%
 %}
-
-\geometry{top=20mm,bottom=20mm,left=20mm,right=20mm}
 
 
 
