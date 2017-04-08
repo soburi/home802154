@@ -192,7 +192,7 @@ toc: true
 # coverfile: カバーページのbody要素内に挿入する内容を記述したファイル名
 cover: _cover.html
 # coverimage: 表紙用画像ファイル
-coverimage: cover.svg
+coverimage: cover.eps
 cover_linear: true
 titlepage: true
 # 目次として抽出するレベル
